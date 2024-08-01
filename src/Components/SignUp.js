@@ -10,7 +10,7 @@ const SignUp = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post("http://localhost:3001/register", { name, email, password })
+    axios.post("https://jcssmartbackend3.onrender.com/register", { name, email, password })
       .then(result => {
         navigate('/login'); // Navigate to login page after successful registration
       })

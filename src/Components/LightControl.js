@@ -11,7 +11,7 @@ const LightControl = () => {
   const toggleLight = async () => {
     const newState = lightState === 'off' ? 'on' : 'off';
     try {
-      await axios.post('http://localhost:3001/api/light', { state: newState });
+      await axios.post('https://jcssmartbackend3.onrender.com/api/light', { state: newState });
       setLightState(newState);
     } catch (error) {
       console.error('Error updating light state:', error);

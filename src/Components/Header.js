@@ -21,6 +21,7 @@ const Header = ({ user, onLogout }) => {
   };
 
   const handleSmartHomeClick = () => {
+    console.log("User: ", user); // Add this line to debug user state
     if (!user) {
       setMessage('You have to login first');
       navigate('/login');
@@ -33,14 +34,16 @@ const Header = ({ user, onLogout }) => {
     <div className="relative top-0 left-0 w-full z-10 p-2 flex flex-row pl-6 items-center bg-white py-3 shadow-md">
       <img className="w-20 h-auto rounded-md" src={jcsGroupImage} alt="jcsGroup" />
 
-      <div className="flex flex-row  items-center pl-6 flex-grow">
+      <div className="flex flex-row items-center pl-6 flex-grow">
         <Link to="/" className="p-2 px-2 text-xl font-semibold">
           Home
         </Link>
         <Link to="/products" className="p-2 px-2 text-xl font-semibold">
           Products
         </Link>
-        <Link to="/about-us" className="p-2 text-xl px-2 font-semibold">About Us</Link>
+        <Link to="/about-us" className="p-2 text-xl px-2 font-semibold">
+          About Us
+        </Link>
       </div>
 
       <div className="flex items-center justify-end">
@@ -76,4 +79,3 @@ const Header = ({ user, onLogout }) => {
 };
 
 export default Header;
-

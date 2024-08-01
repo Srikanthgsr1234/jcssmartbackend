@@ -8,15 +8,15 @@ import "../App.css";
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement);
 
-const GasValue = () => {
-  const [gasData, setGasData] = useState([]);
-  const [latestGas, setLatestGas] = useState(null);
-  const [averageGas, setAverageGas] = useState(null);
+const PlantWatering = () => {
+  const [moistureData, setMoistureData] = useState([]);
+  const [latestMoisture, setLatestMoisture] = useState(null);
+  const [averageMoisture, setAverageMoisture] = useState(null);
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
       {
-        label: 'Average Gas Level',
+        label: 'Average Moisture Level',
         data: [],
         borderColor: 'rgba(54, 162, 235, 1)',
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -28,7 +28,7 @@ const GasValue = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchGasData = async () => {
+    const fetchMoistureData = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -36,7 +36,7 @@ const GasValue = () => {
         const pastDate = new Date();
         pastDate.setDate(now.getDate() - 7);
 
-        const response = await axios.get('https://api.thingspeak.com/channels/2611117/fields/3.json?api_key=TUA7ISQV9AM9NKRJ&results=50');
+        const response = await axios.get('https://api.thingspeak.com/channels/2611117/fields/1.json?api_key=TUA7ISQV9AM9NKRJ&results=50');
         const data = response.data.feeds;
 
         // Filter data to include only the last 7 days
@@ -49,7 +49,7 @@ const GasValue = () => {
           if (!dailyAverages[date]) {
             dailyAverages[date] = [];
           }
-          dailyAverages[date].push(parseFloat(entry.field3));
+          dailyAverages[date].push(parseFloat(entry.field1));
         });
 
         // Create an array for the last 7 days, ensuring that all days are included
@@ -59,19 +59,20 @@ const GasValue = () => {
           const date = moment().subtract(i, 'days').format('YYYY-MM-DD');
           chartLabels.push(moment(date).format('D')); // Display day number
           const values = dailyAverages[date] || [];
-          const average = values.length > 0 ? values.reduce((acc, value) => acc + value, 0) / values.length : 0;
+          const average = values.length > 0 ? values.reduce((acc, value) => acc + (isNaN(value) ? 0 : value), 0) / values.length : 0;
           chartValues.push(average);
         }
 
-        setGasData(filteredData.slice(-6));
-        setLatestGas(data[data.length - 1]?.field3);
-        setAverageGas(isNaN(chartValues.reduce((acc, value) => acc + value, 0) / chartValues.length) ? null : (chartValues.reduce((acc, value) => acc + value, 0) / chartValues.length).toFixed(2));
+        setMoistureData(filteredData.slice(-6));
+        setLatestMoisture(data[data.length - 1]?.field1);
+        const totalAverage = chartValues.reduce((acc, value) => acc + value, 0) / chartValues.length;
+        setAverageMoisture(totalAverage.toFixed(2));
 
         setChartData({
           labels: chartLabels,
           datasets: [
             {
-              label: 'Average Gas Level',
+              label: 'Average Moisture Level',
               data: chartValues,
               borderColor: 'rgba(54, 162, 235, 1)',
               backgroundColor: 'rgba(54, 162, 235, 0.2)',
@@ -80,15 +81,15 @@ const GasValue = () => {
           ],
         });
       } catch (error) {
-        setError('Error fetching gas data. Please try again later.');
-        console.error('Error fetching gas data:', error);
+        setError('Error fetching moisture data. Please try again later.');
+        console.error('Error fetching moisture data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGasData();
-    const interval = setInterval(fetchGasData, 15000);
+    fetchMoistureData();
+    const interval = setInterval(fetchMoistureData, 15000);
 
     return () => clearInterval(interval);
   }, []);
@@ -99,10 +100,10 @@ const GasValue = () => {
       <div className="flex flex-col items-center justify-center min-h-screen m-2 ml-6 bg-gray-200">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 gap-x-16 w-full max-w-screen-lg">
 
-          {/* Current Gas Level Display */}
+          {/* Current Moisture Level Display */}
           <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200 flex items-center justify-center h-48">
             <div className="flex flex-col justify-center items-center space-y-4">
-              <h1 className="text-2xl font-semibold">Gas Sensor</h1>
+              <h1 className="text-2xl font-semibold">Moisture Sensor</h1>
               <button
                 className="py-2 px-4 rounded-lg text-white font-semibold bg-gray-500 hover:opacity-90 transition-opacity duration-300"
                 disabled
@@ -112,38 +113,38 @@ const GasValue = () => {
             </div>
           </div>
 
-          {/* Gas Level Monitoring */}
+          {/* Moisture Level Monitoring */}
           <div className="bg-white rounded-lg shadow-lg p-3 border border-gray-200 h-48">
-            <h1 className="text-xl lg:text-2xl mb-2 text-center font-semibold text-gray-800">Gas Level</h1>
+            <h1 className="text-xl lg:text-2xl mb-2 text-center font-semibold text-gray-800">Moisture Level</h1>
             <div className="flex flex-col items-center space-y-3">
-              <p className="text-base lg:text-lg text-gray-600">Current Gas Level:</p>
+              <p className="text-base lg:text-lg text-gray-600">Current Moisture Level:</p>
               <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-yellow-100 flex items-center justify-center shadow-md">
-                <p className="text-xl lg:text-2xl text-yellow-500">{latestGas !== null ? latestGas : 'Loading...'}</p>
+                <p className="text-xl lg:text-2xl text-yellow-500">{latestMoisture !== null ? latestMoisture : 'Loading...'}</p>
               </div>
             </div>
           </div>
 
-          {/* Average Gas Level */}
+          {/* Average Moisture Level */}
           <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200 h-48">
             <h2 className="text-xl lg:text-2xl mb-4 text-center font-semibold text-gray-800">Average (Last 7 Days)</h2>
             <div className="flex items-center justify-center pt-5">
               <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-blue-100 flex items-center justify-center shadow-md">
-                <p className="text-xl lg:text-2xl text-blue-500">{averageGas !== null ? averageGas : 'Calculating...'}</p>
+                <p className="text-xl lg:text-2xl text-blue-500">{averageMoisture !== null ? averageMoisture : 'Calculating...'}</p>
               </div>
             </div>
           </div>
 
-          {/* Gas Level Over the Last 7 Days */}
+          {/* Moisture Level Over the Last 7 Days */}
           <div className="bg-white rounded-lg shadow-lg p-3 border border-gray-200 lg:col-span-2">
-            <h2 className="text-xl lg:text-xl mb-4 text-center font-semibold text-gray-800">Gas Level Over the Last 7 Days</h2>
+            <h2 className="text-xl lg:text-xl mb-4 text-center font-semibold text-gray-800">Moisture Level Over the Last 7 Days</h2>
             <div className="w-full">
               {loading ? (
                 <p className="text-center text-gray-500">Loading...</p>
               ) : error ? (
                 <p className="text-center text-red-500">{error}</p>
               ) : (
-                <Line
-                  data={chartData}
+                <Line 
+                  data={chartData} 
                   options={{
                     responsive: true,
                     plugins: {
@@ -153,7 +154,7 @@ const GasValue = () => {
                       tooltip: {
                         callbacks: {
                           label: function (tooltipItem) {
-                            return `Gas Level: ${tooltipItem.raw}`;
+                            return `Moisture Level: ${tooltipItem.raw}`;
                           }
                         }
                       }
@@ -180,7 +181,7 @@ const GasValue = () => {
                       y: {
                         title: {
                           display: true,
-                          text: 'Gas Level',
+                          text: 'Moisture Level',
                           color: 'gray',
                           font: {
                             weight: 'bold'
@@ -196,38 +197,28 @@ const GasValue = () => {
                         suggestedMin: Math.floor(Math.min(...chartData.datasets[0].data)) - 1,
                         suggestedMax: Math.ceil(Math.max(...chartData.datasets[0].data)) + 1
                       }
-                    },
-                    animation: {
-                      duration: 2000, // Duration of animation in milliseconds
-                      easing: 'easeInOutQuad', // Easing function for the animation
-                      onProgress: function(animation) {
-                        console.log('Animation in progress');
-                      },
-                      onComplete: function(animation) {
-                        console.log('Animation complete');
-                      },
-                    },
-                  }}
+                    }
+                  }} 
                 />
               )}
             </div>
           </div>
 
-          {/* Historical Gas Data Table */}
+          {/* Historical Moisture Data Table */}
           <div className="bg-white rounded-lg shadow-lg overflow-x-auto p-4 border border-gray-200">
-            <h2 className="text-xl lg:text-xl mb-4 text-center font-semibold text-gray-800">Historical Gas Data</h2>
+            <h2 className="text-xl lg:text-xl mb-4 text-center font-semibold text-gray-800">Historical Moisture Data</h2>
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gas Level</th>
+                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Moisture Level</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {gasData.map((entry) => (
-                  <tr key={entry.created_at}>
-                    <td className="px-6 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{moment(entry.created_at).format('HH:mm:ss')}</td>
-                    <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500">{entry.field3}</td>
+                {moistureData.map((item) => (
+                  <tr key={item.created_at}>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{moment(item.created_at).format('HH:mm:ss')}</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 text-center">{item.field1}</td>
                   </tr>
                 ))}
               </tbody>
@@ -240,4 +231,4 @@ const GasValue = () => {
   );
 };
 
-export default GasValue;
+export default PlantWatering;

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,10 +10,13 @@ const Login = ({ onLogin }) => { // Receive onLogin function prop
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await axios.post("http://localhost:3001/login", { email, password });
+      console.log('Attempting to login with:', email, password);
+      const result = await axios.post("https://jcssmartbackend3.onrender.com/login", { email, password });
+      console.log('Login result:', result.data);
       if (result.data.message === "Success") {
+        console.log('Login successful, navigating to /options');
         onLogin(result.data.user); // Update user state in parent component
-        navigate('/');
+        navigate('/options');
       } else {
         console.log("Login failed");
         // Handle invalid login case, show error message if needed
