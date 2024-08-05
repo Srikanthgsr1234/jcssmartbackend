@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from './Sidebar';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js';
 import moment from 'moment-timezone';
 import "../App.css";
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
 const PlantWatering = () => {
   const [moistureData, setMoistureData] = useState([]);
@@ -18,14 +18,15 @@ const PlantWatering = () => {
       {
         label: 'Average Moisture Level',
         data: [],
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
         borderColor: 'rgba(54, 162, 235, 1)',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderWidth: 2,
+        borderWidth: 1,
       },
     ],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isPumpOn, setIsPumpOn] = useState(false);
 
   useEffect(() => {
     const fetchMoistureData = async () => {
@@ -36,7 +37,7 @@ const PlantWatering = () => {
         const pastDate = new Date();
         pastDate.setDate(now.getDate() - 7);
 
-        const response = await axios.get('https://api.thingspeak.com/channels/2611117/fields/1.json?api_key=TUA7ISQV9AM9NKRJ&results=50');
+        const response = await axios.get('https://api.thingspeak.com/channels/2613094/fields/1.json?api_key=0LJTOMMY1FVCXXFM&results=400');
         const data = response.data.feeds;
 
         // Filter data to include only the last 7 days
@@ -74,9 +75,9 @@ const PlantWatering = () => {
             {
               label: 'Average Moisture Level',
               data: chartValues,
+              backgroundColor: 'rgba(54, 162, 235, 0.6)',
               borderColor: 'rgba(54, 162, 235, 1)',
-              backgroundColor: 'rgba(54, 162, 235, 0.2)',
-              borderWidth: 2,
+              borderWidth: 1,
             },
           ],
         });
@@ -94,6 +95,16 @@ const PlantWatering = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handlePumpToggle = async () => {
+    try {
+      const action = isPumpOn ? 'off' : 'on';
+      await axios.post('http://localhost:3001/api/pump-control', { action });
+      setIsPumpOn(prevState => !prevState);
+    } catch (error) {
+      alert('Failed to control the pump');
+    }
+  };
+
   return (
     <div className="min-h-screen flex relative bg-gray-200">
       <Sidebar />
@@ -105,10 +116,10 @@ const PlantWatering = () => {
             <div className="flex flex-col justify-center items-center space-y-4">
               <h1 className="text-2xl font-semibold">Moisture Sensor</h1>
               <button
-                className="py-2 px-4 rounded-lg text-white font-semibold bg-gray-500 hover:opacity-90 transition-opacity duration-300"
-                disabled
+                className={`py-2 px-4 rounded-lg text-white font-semibold ${isPumpOn ? 'bg-red-500' : 'bg-green-500'} hover:opacity-90 transition-opacity duration-300`}
+                onClick={handlePumpToggle}
               >
-                Sensor Status
+                {isPumpOn ? 'Turn Off Pump' : 'Turn On Pump'}
               </button>
             </div>
           </div>
@@ -143,7 +154,7 @@ const PlantWatering = () => {
               ) : error ? (
                 <p className="text-center text-red-500">{error}</p>
               ) : (
-                <Line 
+                <Bar 
                   data={chartData} 
                   options={{
                     responsive: true,
@@ -194,8 +205,10 @@ const PlantWatering = () => {
                             return Number.isInteger(value) ? value : '';
                           }
                         },
-                        suggestedMin: Math.floor(Math.min(...chartData.datasets[0].data)) - 1,
-                        suggestedMax: Math.ceil(Math.max(...chartData.datasets[0].data)) + 1
+                        suggestedMin: 0, // Start y-axis from 0
+                        grid: {
+                          display: false, // Hide grid lines
+                        }
                       }
                     }
                   }} 

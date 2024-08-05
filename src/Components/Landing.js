@@ -12,7 +12,7 @@ const Landing = () => {
         </h2>
         <Link
           to="/products"
-          className="text-xl lg:text-2xl px-4 py-2 rounded-lg font-bold bg-white text-blue-950 inline-block hover:bg-gray-100 transition-colors duration-300"
+          className="text-xl lg:text-2xl px-4 py-2 rounded-lg font-bold bg-white text-blue-950 inline-block hover:bg-gray-100 transition-colors duration-300 hover:scale-105"
         >
           Shop Now
         </Link>

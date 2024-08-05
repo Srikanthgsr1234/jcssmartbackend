@@ -48,11 +48,11 @@ const Products = () => {
       </div>
 
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6  lg:gap-10">
           {products.map((product) => (
-            <div key={product.id} className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col items-center">
+            <div key={product.id} className="rounded-lg overflow-hidden flex flex-col items-center">
               <img
-                className="w-full h-52 object-cover" // Reduced height for a smaller appearance
+                className="w-72 h-60 rounded-lg " // Reduced height for a smaller appearance
                 src={product.image}
                 alt={product.title}
               />
@@ -60,7 +60,7 @@ const Products = () => {
                 <h2 className="text-lg font-semibold mb-4">{product.title}</h2>
                 <Link
                   to="/contactform"
-                  className="inline-block text-md font-medium px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 transition duration-300"
+                  className="inline-block text-md font-medium px-3 py-2 rounded-lg bg-black text-white hover:bg-gray-800 transition duration-300 hover:scale-105"
                 >
                   Shop Now
                 </Link>

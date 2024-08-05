@@ -4,8 +4,8 @@ import Footer from './Footer';
 const AboutUs = () => {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="flex items-center justify-center bg-blue-950 text-white py-16 lg:py-20">
-        <h1 className="text-3xl lg:text-5xl font-bold text-center">
+      <header className="flex items-center justify-center bg-blue-950 text-white py-16 lg:py-12">
+        <h1 className="text-2xl lg:text-4xl font-bold text-center">
           About Us
         </h1>
       </header>

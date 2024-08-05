@@ -36,7 +36,7 @@ const GasValue = () => {
         const pastDate = new Date();
         pastDate.setDate(now.getDate() - 7);
 
-        const response = await axios.get('https://api.thingspeak.com/channels/2611117/fields/3.json?api_key=TUA7ISQV9AM9NKRJ&results=50');
+        const response = await axios.get('https://api.thingspeak.com/channels/2611117/fields/3.json?api_key=TUA7ISQV9AM9NKRJ&results=200');
         const data = response.data.feeds;
 
         // Filter data to include only the last 7 days

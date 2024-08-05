@@ -3,7 +3,7 @@ import shortImage from "../Assets/short.jpg";
 
 const AppWorking = () => {
   return (
-    <section className="py-16 px-4 lg:px-8">
+    <section className="py-16 pt-20 px-4 lg:px-8">
       <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between">
         <div className="flex flex-col w-full lg:w-[500px] lg:pl-10 lg:pt-10 mb-10 lg:mb-0">
           <h1 className="text-2xl text-sky-600 py-3 font-semibold">SHORTCUTS</h1>

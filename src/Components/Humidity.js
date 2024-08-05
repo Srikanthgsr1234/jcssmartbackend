@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import Sidebar from './Sidebar';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement } from 'chart.js';
 import moment from 'moment-timezone';
+import PropTypes from 'prop-types';
 import "../App.css";
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement);
@@ -36,7 +37,7 @@ const Humidity = () => {
         const pastDate = new Date();
         pastDate.setDate(now.getDate() - 7);
 
-        const response = await axios.get('https://api.thingspeak.com/channels/2611117/fields/2.json?api_key=TUA7ISQV9AM9NKRJ&results=100');
+        const response = await axios.get('https://api.thingspeak.com/channels/2611117/fields/2.json?api_key=TUA7ISQV9AM9NKRJ&results=200');
         const data = response.data.feeds;
 
         // Filter data to include only the last 7 days
@@ -106,6 +107,61 @@ const Humidity = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const chartOptions = useMemo(() => ({
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem) {
+            return `Humidity: ${tooltipItem.raw} %`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Date',
+          color: 'gray',
+          font: {
+            weight: 'bold'
+          }
+        },
+        ticks: {
+          color: 'gray',
+          callback: function(value, index) {
+            return chartData.labels[index];
+          },
+          maxRotation: 45,
+          minRotation: 45,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Humidity (%)',
+          color: 'gray',
+          font: {
+            weight: 'bold'
+          }
+        },
+        ticks: {
+          color: 'gray',
+          stepSize: 1,
+          callback: function(value) {
+            return Number.isInteger(value) ? value : '';
+          }
+        },
+        suggestedMin: Math.floor(Math.min(...chartData.datasets[0].data)) - 1,
+        suggestedMax: Math.ceil(Math.max(...chartData.datasets[0].data)) + 1
+      }
+    }
+  }), [chartData]);
+
   return (
     <div className="min-h-screen flex relative bg-gray-200">
       <Sidebar />
@@ -157,91 +213,65 @@ const Humidity = () => {
               ) : (
                 <Line 
                   data={chartData} 
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      tooltip: {
-                        callbacks: {
-                          label: function (tooltipItem) {
-                            return `Humidity: ${tooltipItem.raw} %`;
-                          }
-                        }
-                      }
-                    },
-                    scales: {
-                      x: {
-                        title: {
-                          display: true,
-                          text: 'Date',
-                          color: 'gray',
-                          font: {
-                            weight: 'bold'
-                          }
-                        },
-                        ticks: {
-                          color: 'gray',
-                          callback: function(value, index) {
-                            return chartData.labels[index];
-                          },
-                          maxRotation: 45,
-                          minRotation: 45,
-                        },
-                      },
-                      y: {
-                        title: {
-                          display: true,
-                          text: 'Humidity (%)',
-                          color: 'gray',
-                          font: {
-                            weight: 'bold'
-                          }
-                        },
-                        ticks: {
-                          color: 'gray',
-                          stepSize: 1,
-                          callback: function(value) {
-                            return Number.isInteger(value) ? value : '';
-                          }
-                        },
-                        suggestedMin: Math.floor(Math.min(...chartData.datasets[0].data)) - 1,
-                        suggestedMax: Math.ceil(Math.max(...chartData.datasets[0].data)) + 1
-                      }
-                    }
-                  }} 
+                  options={chartOptions} 
                 />
               )}
             </div>
           </div>
 
           {/* Historical Humidity Data Table */}
-          <div className="bg-white rounded-lg shadow-lg overflow-x-auto p-4 border border-gray-200">
-            <h2 className="text-xl lg:text-xl mb-4 text-center font-semibold text-gray-800">Historical Humidity Data</h2>
-            <table className="min-w-full bg-white border border-gray-300">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b border-gray-300 text-left">Time</th>
-                  <th className="py-2 px-4 border-b border-gray-300 text-left">Humidity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {humidityData.map((entry, index) => (
-                  <tr key={index}>
-                    <td className="py-2 px-4 border-b border-gray-300">
-                      {moment(entry.created_at).tz('Asia/Kolkata').format('HH:mm:ss')}
-                    </td>
-                    <td className="py-2 px-4 border-b border-gray-300">{entry.field2}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="bg-white rounded-lg shadow-lg p-3 border border-gray-200">
+            <h2 className="text-xl lg:text-xl mb-2 text-center font-semibold text-gray-800">Historical Humidity Data</h2>
+            {loading ? (
+              <p className="text-center text-gray-500">Loading...</p>
+            ) : error ? (
+              <p className="text-center text-red-500">{error}</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white">
+                  <thead>
+                    <tr>
+                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-100">Timestamp</th>
+                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-100">Humidity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {humidityData.length === 0 ? (
+                      <tr>
+                        <td colSpan="2" className="py-3 px-4 text-center text-gray-500">No data available</td>
+                      </tr>
+                    ) : (
+                      humidityData.map((entry, index) => (
+                        <tr key={index}>
+                          <td className="py-2 px-4 border-b border-gray-200">
+                            {moment(entry.created_at).tz('Asia/Kolkata').format('HH:mm:ss')}
+                          </td>
+                          <td className="py-2 px-4 border-b border-gray-200">{entry.field2}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
+};
+
+Humidity.propTypes = {
+  chartData: PropTypes.shape({
+    labels: PropTypes.arrayOf(PropTypes.string),
+    datasets: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string,
+      data: PropTypes.arrayOf(PropTypes.number),
+      borderColor: PropTypes.string,
+      backgroundColor: PropTypes.string,
+      borderWidth: PropTypes.number
+    }))
+  })
 };
 
 export default Humidity;

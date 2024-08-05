@@ -5,8 +5,8 @@ import { UilEnvelope, UilPhone, UilWhatsappAlt } from '@iconscout/react-unicons'
 const Contact = () => {
   return (
     <div>
-      <div className="bg-blue-950 text-white h-56 flex items-center justify-center">
-        <h1 className="text-3xl sm:text-5xl font-bold text-center w-full px-4 py-16 sm:py-20">
+      <div className="bg-blue-950 text-white h-32 flex items-center justify-center">
+        <h1 className="text-2xl sm:text-4xl font-bold text-center w-full px-4 py-16 sm:py-12">
           Contact Us
         </h1>
       </div>

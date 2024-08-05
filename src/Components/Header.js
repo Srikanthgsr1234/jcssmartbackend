@@ -35,13 +35,13 @@ const Header = ({ user, onLogout }) => {
       <img className="w-20 h-auto rounded-md" src={jcsGroupImage} alt="jcsGroup" />
 
       <div className="flex flex-row items-center pl-6 flex-grow">
-        <Link to="/" className="p-2 px-2 text-xl font-semibold">
+        <Link to="/" className="p-2 px-2 text-xl font-semibold hover:text-blue-600 hover:scale-105">
           Home
         </Link>
-        <Link to="/products" className="p-2 px-2 text-xl font-semibold">
+        <Link to="/products" className="p-2 px-2 text-xl font-semibold hover:text-blue-600 hover:scale-105">
           Products
         </Link>
-        <Link to="/about-us" className="p-2 text-xl px-2 font-semibold">
+        <Link to="/about-us" className="p-2 text-xl px-2 font-semibold hover:text-blue-600 hover:scale-105">
           About Us
         </Link>
       </div>
@@ -58,19 +58,19 @@ const Header = ({ user, onLogout }) => {
             <span className="p-2 text-xl font-semibold pr-4">{user.name}</span>
             <button
               onClick={handleLogout}
-              className="p-2 text-xl font-semibold pr-10 transition-transform transform hover:scale-105"
+              className="p-2 text-xl font-semibold pr-10 transition-transform transform hover:scale-105 hover:text-blue-600"
             >
               Logout
             </button>
           </>
         ) : (
-          <Link to="/login" className="p-2 text-xl font-semibold pr-10">
+          <Link to="/login" className="p-2 text-xl font-semibold pr-10 hover:text-blue-600">
             Login
           </Link>
         )}
       </div>
       {message && (
-        <div className="fixed top-20 right-10 p-4 bg-red-500 text-white rounded-lg shadow-lg animate-fade-in-down transition-opacity duration-300">
+        <div className="fixed top-20 right-10 p-2 bg-red-500 text-white rounded-lg shadow-lg animate-fade-in-down transition-opacity duration-300">
           {message}
         </div>
       )}

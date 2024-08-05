@@ -59,12 +59,6 @@ const Footer = () => {
       <div className="py-8 text-gray-300 flex items-center justify-center">
         <h1 className={`${responsiveTextStyle}`}>©2020 JCS Global. All Rights Reserved | Caution Notice</h1>
       </div>
-
-      <div className="flex flex-wrap justify-center pb-10">
-        <h1 className={`text-2xl text-white px-6 ${responsiveTextStyle}`}>JCS Group</h1>
-        <h1 className={`text-2xl text-white px-6 ${responsiveTextStyle}`}>Carry Carter</h1>
-        <h1 className={`text-2xl text-white px-6 ${responsiveTextStyle}`}>JCS Hub</h1>
-      </div>
     </div>
   );
 };
