@@ -54,3 +54,118 @@
 .animate-drop {
   animation: drop 1s infinite;
 }
+
+
+
+/* styles.css */
+.dropdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dropdown-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdown-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+
+/* ImageCarousel.css */
+.carousel-slide {
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+}
+
+.carousel-slide.dim {
+  opacity: 0.5;
+}
+
+.carousel-slide.entering {
+  opacity: 0.5;
+}
+
+.carousel-slide.entered {
+  opacity: 1;
+}
+
+
+
+
+/* App.css */
+/* App.css */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.carousel-content {
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+}
+
+.carousel-content-up {
+  animation-name: slideUp;
+}
+
+.carousel-content-down {
+  animation-name: slideDown;
+}
+
+.carousel-content-left {
+  animation-name: slideLeft;
+}
+
+.carousel-content-right {
+  animation-name: slideRight;
+}

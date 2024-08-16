@@ -1,10 +1,13 @@
 import React from 'react';
-import bellImage from "../Assets/bell.jpg";
-import CamImage from "../Assets/cam.jpg";
-import LightImage from "../Assets/lights.avif";
-import TempImage from "../Assets/temperatue1.jpg";
-import gasImage from "../Assets/gassensor.jpg";
-import doorlockImage from "../Assets/doorlock.webp";
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
+import { motion } from 'framer-motion';
+import bellImage from '../Assets/bell.jpg';
+import CamImage from '../Assets/cam.jpg';
+import LightImage from '../Assets/lights.avif';
+import TempImage from '../Assets/temperatue1.jpg';
+import gasImage from '../Assets/gassensor.jpg';
+import doorlockImage from '../Assets/doorlock.webp';
 import { Link } from 'react-router-dom';
 
 const products = [
@@ -48,13 +51,21 @@ const Products = () => {
       </div>
 
       <div className="container mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6  lg:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 lg:gap-10">
           {products.map((product) => (
-            <div key={product.id} className="rounded-lg overflow-hidden flex flex-col items-center">
-              <img
-                className="w-72 h-60 rounded-lg " // Reduced height for a smaller appearance
+            <motion.div
+              key={product.id}
+              className="rounded-lg overflow-hidden flex flex-col items-center"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: product.id * 0.2 }}
+            >
+              <LazyLoadImage
+                className="w-72 h-60 rounded-lg"
                 src={product.image}
                 alt={product.title}
+                effect="blur" // You can also use "opacity" or "black-and-white"
               />
               <div className="p-3 text-center">
                 <h2 className="text-lg font-semibold mb-4">{product.title}</h2>
@@ -65,7 +76,7 @@ const Products = () => {
                   Shop Now
                 </Link>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

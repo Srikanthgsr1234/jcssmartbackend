@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { IoHomeOutline, IoThermometerOutline, IoBulbOutline } from "react-icons/io5";
 import { GiPlantWatering } from "react-icons/gi";
-import { WiHumidity } from "react-icons/wi";
+import { WiHumidity, WiWindy } from "react-icons/wi";
 import { FaFireAlt } from "react-icons/fa";
-import { WiWindy } from "react-icons/wi";
 
 const Sidebar = () => {
   const menuItems = [
@@ -21,7 +21,13 @@ const Sidebar = () => {
     <div className="w-60 h-screen bg-blue-950 flex flex-col items-start py-4 px-2 rounded-md shadow-lg">
       <ul className="w-full">
         {menuItems.map((item, index) => (
-          <li className="w-full mb-2" key={index}>
+          <motion.li
+            key={index}
+            className="w-full mb-2"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+          >
             <Link
               to={item.to}
               className="flex items-center text-lg font-semibold text-white p-3 rounded-lg transition duration-300 ease-in-out transform hover:bg-white hover:text-blue-950 hover:scale-105"
@@ -29,7 +35,7 @@ const Sidebar = () => {
               {item.icon}
               <span className="ml-2">{item.label}</span>
             </Link>
-          </li>
+          </motion.li>
         ))}
       </ul>
     </div>

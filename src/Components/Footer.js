@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BsInstagram, BsTwitterX, BsFacebook, BsLinkedin } from "react-icons/bs";
 import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import jcsGroupImage from '../Assets/jcsgr.png';
 
 const Footer = () => {
@@ -28,20 +29,38 @@ const Footer = () => {
 
   return (
     <div className="bg-blue-950 mt-16">
-      <div className="flex items-center justify-center pt-16">
+      <motion.div
+        className="flex items-center justify-center pt-16"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
         <img className="h-20 w-auto rounded-lg" src={jcsGroupImage} alt="JCS Group" />
-      </div>
+      </motion.div>
       
-      <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} justify-center pt-8`}>
+      <motion.div
+        className={`flex ${isMobile ? 'flex-col' : 'flex-row'} justify-center pt-8`}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
         <NavLink to="/about-us" className={`px-6 text-white font-semibold ${responsiveTextStyle} ${isMobile ? 'pb-6' : ''}`}>
           About Us
         </NavLink>
         <NavLink to="/contact-us" className={`px-6 text-white font-semibold ${responsiveTextStyle} ${isMobile ? 'pb-6' : ''}`}>
           Contact Us
         </NavLink>
-      </div>
+      </motion.div>
 
-      <div className="flex justify-center space-x-10 py-8 border-b border-gray-700">
+      <motion.div
+        className="flex justify-center space-x-10 py-8 border-b border-gray-700"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
         <a href="https://www.facebook.com/jcserviceshub" target="_blank" rel="noopener noreferrer" className="hover:text-[#2f29d6]">
           <BsFacebook className={`${responsiveIconStyle}`} />
         </a>
@@ -54,11 +73,17 @@ const Footer = () => {
         <a href="https://x.com/jcshub?lang=en" target="_blank" rel="noopener noreferrer" className="hover:text-[#00acee]">
           <BsTwitterX className={`${responsiveIconStyle}`} />
         </a>
-      </div>
+      </motion.div>
       
-      <div className="py-8 text-gray-300 flex items-center justify-center">
+      <motion.div
+        className="py-8 text-gray-300 flex items-center justify-center"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+      >
         <h1 className={`${responsiveTextStyle}`}>©2020 JCS Global. All Rights Reserved | Caution Notice</h1>
-      </div>
+      </motion.div>
     </div>
   );
 };

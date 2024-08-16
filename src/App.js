@@ -15,6 +15,12 @@ import AboutUs from './Components/AboutUs';
 import Contact from './Components/Contact';
 import ContactForm from './Components/ContactForm';
 import PlantWatering from './Components/PlantWatering';
+import HomeA from './Components/HomeA';
+import BuildingA from './Components/BuildingA';
+import OfficeA from './Components/OfficeA';
+import HotelA from './Components/HotelA';
+import HospitalA from './Components/HospitalA';
+import IndustrialA from './Components/IndustrialA';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -54,6 +60,12 @@ function App() {
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/contact-us" element={<Contact />} />
         <Route path="/contactform" element={<ContactForm />} />
+        <Route path="/homeA" element={<HomeA />} />
+        <Route path="/buildingA" element={<BuildingA />} />
+        <Route path="/officeA" element={<OfficeA />} />
+        <Route path="/hotelA" element={<HotelA />} />
+        <Route path="/hospitalA" element={<HospitalA />} />
+        <Route path="/industrialA" element={<IndustrialA />} />
       </Routes>
     </Router>
   );

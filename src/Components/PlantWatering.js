@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js';
 import moment from 'moment-timezone';
+import { motion } from 'framer-motion';
 import "../App.css";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
@@ -12,6 +13,7 @@ const PlantWatering = () => {
   const [moistureData, setMoistureData] = useState([]);
   const [latestMoisture, setLatestMoisture] = useState(null);
   const [averageMoisture, setAverageMoisture] = useState(null);
+  const [pumpState, setPumpState] = useState('off');
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
@@ -26,7 +28,6 @@ const PlantWatering = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isPumpOn, setIsPumpOn] = useState(false);
 
   useEffect(() => {
     const fetchMoistureData = async () => {
@@ -37,7 +38,7 @@ const PlantWatering = () => {
         const pastDate = new Date();
         pastDate.setDate(now.getDate() - 7);
 
-        const response = await axios.get('https://api.thingspeak.com/channels/2613094/fields/1.json?api_key=0LJTOMMY1FVCXXFM&results=400');
+        const response = await axios.get('https://api.thingspeak.com/channels/2613094/fields/1.json?api_key=0LJTOMMY1FVCXXFM&results=200');
         const data = response.data.feeds;
 
         // Filter data to include only the last 7 days
@@ -60,14 +61,13 @@ const PlantWatering = () => {
           const date = moment().subtract(i, 'days').format('YYYY-MM-DD');
           chartLabels.push(moment(date).format('D')); // Display day number
           const values = dailyAverages[date] || [];
-          const average = values.length > 0 ? values.reduce((acc, value) => acc + (isNaN(value) ? 0 : value), 0) / values.length : 0;
+          const average = values.length > 0 ? values.reduce((acc, value) => acc + value, 0) / values.length : 0;
           chartValues.push(average);
         }
 
         setMoistureData(filteredData.slice(-6));
         setLatestMoisture(data[data.length - 1]?.field1);
-        const totalAverage = chartValues.reduce((acc, value) => acc + value, 0) / chartValues.length;
-        setAverageMoisture(totalAverage.toFixed(2));
+        setAverageMoisture(isNaN(chartValues.reduce((acc, value) => acc + value, 0) / chartValues.length) ? null : (chartValues.reduce((acc, value) => acc + value, 0) / chartValues.length).toFixed(2));
 
         setChartData({
           labels: chartLabels,
@@ -95,15 +95,16 @@ const PlantWatering = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handlePumpToggle = async () => {
+  const togglePump = async () => {
+    const newState = pumpState === 'off' ? 'on' : 'off';
     try {
-      const action = isPumpOn ? 'off' : 'on';
-      await axios.post('http://localhost:3001/api/pump-control', { action });
-      setIsPumpOn(prevState => !prevState);
+      await axios.post('http://localhost:3001/api/water', { state: newState }); // Adjusted backend port
+      setPumpState(newState);
     } catch (error) {
-      alert('Failed to control the pump');
+      console.error('Error updating pump state:', error);
     }
   };
+
 
   return (
     <div className="min-h-screen flex relative bg-gray-200">
@@ -112,41 +113,65 @@ const PlantWatering = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 gap-x-16 w-full max-w-screen-lg">
 
           {/* Current Moisture Level Display */}
-          <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200 flex items-center justify-center h-48">
+          <motion.div
+            className="bg-white rounded-lg shadow-lg p-4 border border-gray-200 flex items-center justify-center h-48"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <div className="flex flex-col justify-center items-center space-y-4">
               <h1 className="text-2xl font-semibold">Moisture Sensor</h1>
               <button
-                className={`py-2 px-4 rounded-lg text-white font-semibold ${isPumpOn ? 'bg-red-500' : 'bg-green-500'} hover:opacity-90 transition-opacity duration-300`}
-                onClick={handlePumpToggle}
-              >
-                {isPumpOn ? 'Turn Off Pump' : 'Turn On Pump'}
-              </button>
+                    onClick={togglePump}
+                    className={`px-4 py-2 rounded-lg text-base lg:text-lg w-auto ${
+                      pumpState === 'off'
+                        ? 'bg-red-500 hover:bg-red-700'
+                        : 'bg-blue-500 hover:bg-blue-700'
+                    } text-white`}
+                  >
+                    {pumpState === 'off' ? 'Turn Pump Off' : 'Turn Pump On'}
+                  </button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Moisture Level Monitoring */}
-          <div className="bg-white rounded-lg shadow-lg p-3 border border-gray-200 h-48">
+          <motion.div
+            className="bg-white rounded-lg shadow-lg p-3 border border-gray-200 h-48"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <h1 className="text-xl lg:text-2xl mb-2 text-center font-semibold text-gray-800">Moisture Level</h1>
             <div className="flex flex-col items-center space-y-3">
               <p className="text-base lg:text-lg text-gray-600">Current Moisture Level:</p>
-              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-yellow-100 flex items-center justify-center shadow-md">
-                <p className="text-xl lg:text-2xl text-yellow-500">{latestMoisture !== null ? latestMoisture : 'Loading...'}</p>
+              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-blue-100 flex items-center justify-center shadow-md">
+                <p className="text-xl lg:text-2xl text-blue-500">{latestMoisture !== null ? latestMoisture : 'Loading...'}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Average Moisture Level */}
-          <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200 h-48">
+          <motion.div
+            className="bg-white rounded-lg shadow-lg p-4 border border-gray-200 h-48"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
             <h2 className="text-xl lg:text-2xl mb-4 text-center font-semibold text-gray-800">Average (Last 7 Days)</h2>
             <div className="flex items-center justify-center pt-5">
-              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-blue-100 flex items-center justify-center shadow-md">
-                <p className="text-xl lg:text-2xl text-blue-500">{averageMoisture !== null ? averageMoisture : 'Calculating...'}</p>
+              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-green-100 flex items-center justify-center shadow-md">
+                <p className="text-xl lg:text-2xl text-green-500">{averageMoisture !== null ? averageMoisture : 'Calculating...'}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Moisture Level Over the Last 7 Days */}
-          <div className="bg-white rounded-lg shadow-lg p-3 border border-gray-200 lg:col-span-2">
+          <motion.div
+            className="bg-white rounded-lg shadow-lg p-3 border border-gray-200 lg:col-span-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
             <h2 className="text-xl lg:text-xl mb-4 text-center font-semibold text-gray-800">Moisture Level Over the Last 7 Days</h2>
             <div className="w-full">
               {loading ? (
@@ -154,8 +179,8 @@ const PlantWatering = () => {
               ) : error ? (
                 <p className="text-center text-red-500">{error}</p>
               ) : (
-                <Bar 
-                  data={chartData} 
+                <Bar
+                  data={chartData}
                   options={{
                     responsive: true,
                     plugins: {
@@ -200,44 +225,46 @@ const PlantWatering = () => {
                         },
                         ticks: {
                           color: 'gray',
-                          stepSize: 1,
-                          callback: function(value) {
-                            return Number.isInteger(value) ? value : '';
-                          }
                         },
-                        suggestedMin: 0, // Start y-axis from 0
-                        grid: {
-                          display: false, // Hide grid lines
-                        }
-                      }
-                    }
-                  }} 
+                      },
+                    },
+                  }}
                 />
               )}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Historical Moisture Data Table */}
-          <div className="bg-white rounded-lg shadow-lg overflow-x-auto p-4 border border-gray-200">
+          {/* Historical Data Table */}
+          <motion.div
+            className="bg-white rounded-lg shadow-lg overflow-x-auto p-4 border border-gray-200"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
             <h2 className="text-xl lg:text-xl mb-4 text-center font-semibold text-gray-800">Historical Moisture Data</h2>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                  <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Moisture Level</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {moistureData.map((item) => (
-                  <tr key={item.created_at}>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{moment(item.created_at).format('HH:mm:ss')}</td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 text-center">{item.field1}</td>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                    <th className="px-6 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Moisture</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {moistureData.map((entry, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500">
+                        {moment(entry.created_at).tz('Asia/Kolkata').format('HH:mm:ss')}
+                      </td>
+                      <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-500">
+                        {entry.field1}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
